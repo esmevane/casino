@@ -76,8 +76,17 @@ module Casino
       end
     end
 
+    def update
+      merge all_results
+      stored_results
+    end
+
+    def merge(documents)
+      store.merge *documents
+    end
+
     def persist_results
-      store.merge *collected_results
+      merge collected_results
     end
 
     def collected_results
@@ -85,7 +94,15 @@ module Casino
     end
 
     def pending_results
-      pending_intersections.map do |current_intersection|
+      determine_results pending_intersections
+    end
+
+    def all_results
+      determine_results intersections
+    end
+
+    def determine_results(given_intersections)
+      given_intersections.map do |current_intersection|
         @intersection = current_intersection.criteria
         result = { _id: intersection.selector }.merge(answers)
       end
@@ -132,6 +149,10 @@ module Casino
 
     def projection
       Casino::Projection.new(focus_model).where(intersection.selector)
+    end
+
+    def answer(method_name)
+      send(method_name)
     end
 
     def pending_intersections

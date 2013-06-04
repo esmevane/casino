@@ -59,7 +59,7 @@ Casino is a DSL which helps you interact with and explore your `Mongoid::Documen
 
 ### Instance methods
 
-#### Answer (*pending*)
+#### Answer
   * **Arguments:**
     * *Method name:* A `:symbol` pointing to another question.  This method returns the results of that question.
   * **Returns:** An answered question key/value pair: `{ question_name: question_answer }`
@@ -74,7 +74,7 @@ Casino is a DSL which helps you interact with and explore your `Mongoid::Documen
   * **Arguments:** None
   * **Returns:** `Mongoid::Criteria` - A window into the currently active criteria being questioned.
 
-#### Projection (*pending*)
+#### Projection
   * **Arguments:** None
   * **Returns:** A `Casino::Projection` object preloaded with the current intersection selector, which wraps around MongoDB's aggregation framework.
 
@@ -88,6 +88,6 @@ Casino is a DSL which helps you interact with and explore your `Mongoid::Documen
   * **Arguments:** None
   * **Returns:** A list of answer hashes for every intersection.  Casino persists intersection results to a generated MongoDB collection the first time it is used, and afterward will just combine already produced results with new results (in essence, it only queries for new information and remembers the rest).
 
-#### Update (*pending*)
+#### Update
   * **Arguments:** None
   * **Returns:** Re-generates the entire generated collection.

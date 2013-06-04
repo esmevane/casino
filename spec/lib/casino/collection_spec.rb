@@ -155,6 +155,15 @@ describe Casino::Collection do
       end
     end
 
+    describe '#answer' do
+      subject { emails_by_day.answer(:count_emails) }
+      it "calls the target method" do
+        emails_by_day.stub(:count_emails, true) do
+          subject.must_equal true
+        end
+      end
+    end
+
     describe '#persist_results' do
 
       subject { emails_by_day.persist_results }
