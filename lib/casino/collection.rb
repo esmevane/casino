@@ -68,12 +68,8 @@ module Casino
     end
 
     def results
-      if pending_results.any?
-        persist_results
-        stored_results
-      else
-        stored_results
-      end
+      persist_results if pending_results.any?
+      stored_results
     end
 
     def update
@@ -126,22 +122,6 @@ module Casino
     def intersection
       @intersection || focus_model.scoped
     end
-
-    # Untested
-
-    def to_csv
-      headers = dimensions.map(&:label) + questions.map(&:name)
-      CSV.generate(headers: headers, write_headers: true) do |csv|
-        intersections.each do |current_intersection|
-          @intersection = current_intersection.criteria
-          whereabouts = current_intersection.label
-          answers = questions.map { |question| send(question.answer) }
-          csv << whereabouts + answers
-        end
-      end
-    end
-
-    # -- End of untested code
 
     def store
       @store ||= Store.new key

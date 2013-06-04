@@ -1,3 +1,8 @@
+require 'simplecov'
+SimpleCov.start do
+  add_filter "/spec/"
+end
+
 require 'casino'
 require 'minitest/autorun'
 require 'minitest/pride'
@@ -5,6 +10,7 @@ require 'database_cleaner'
 require 'fabrication'
 
 Mongoid.load! "./spec/support/mongoid.yml", :test
+
 
 require './spec/fixtures/models/model'
 require './spec/fixtures/models/note'
