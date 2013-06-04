@@ -1,6 +1,6 @@
 module Casino
   module Collection
-    attr_accessor :intersection, :answer
+    attr_reader :intersection, :answer
 
     def self.included(base)
       base.extend ClassMethods
@@ -86,7 +86,7 @@ module Casino
 
     def pending_results
       pending_intersections.map do |current_intersection|
-        self.intersection = current_intersection.criteria
+        @intersection = current_intersection.criteria
         result = { _id: intersection.selector }.merge(answers)
       end
     end
@@ -106,20 +106,17 @@ module Casino
       intersections.map(&:selector)
     end
 
-    # Untested
-
-    def pending_intersections
-      ids = stored_results.map(&:id)
-      intersections.reject do |intersection|
-        ids.include? intersection.selector
-      end
+    def intersection
+      @intersection || focus_model.scoped
     end
+
+    # Untested
 
     def to_csv
       headers = dimensions.map(&:label) + questions.map(&:name)
       CSV.generate(headers: headers, write_headers: true) do |csv|
         intersections.each do |current_intersection|
-          self.intersection = current_intersection.criteria
+          @intersection = current_intersection.criteria
           whereabouts = current_intersection.label
           answers = questions.map { |question| send(question.answer) }
           csv << whereabouts + answers
@@ -132,6 +129,23 @@ module Casino
     def store
       @store ||= Store.new key
     end
+
+    def projection
+      Casino::Projection.new(focus_model).where(intersection.selector)
+    end
+
+    def pending_intersections
+      ids = stored_results.map(&:id)
+      intersections.reject do |intersection|
+        ids.include? intersection.selector
+      end
+    end
+    private :pending_intersections
+
+    def focus_model
+      focus.map(&:model).first
+    end
+    private :focus_model
 
     def all_queries
       dimensions.map { |dimension| queries(dimension) }

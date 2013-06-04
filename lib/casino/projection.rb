@@ -61,7 +61,15 @@ module Casino
       new_key = mongo_ready(key)
       value = hash[key]
       value = value.is_a?(Hash) ? mongoize(value) : mongo_ready(value)
-      { new_key => value }
+      { new_key => evolve(value) }
+    end
+
+    def evolve(value)
+      if value.class.respond_to? :evolve
+        value.class.evolve(value)
+      else
+        value
+      end
     end
 
     def mongo_ready(object)

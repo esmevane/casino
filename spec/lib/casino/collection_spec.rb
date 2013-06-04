@@ -10,6 +10,7 @@ describe Casino::Collection do
     it { Collection.new.must_respond_to :query }
     it { Collection.new.must_respond_to :intersection }
     it { Collection.new.must_respond_to :answer }
+    it { Collection.new.must_respond_to :projection }
   end
 
   describe '.dimension' do
@@ -127,6 +128,31 @@ describe Casino::Collection do
     describe '#results' do
       subject { emails_by_day.results }
       it { subject.must_be_instance_of Mongoid::Criteria }
+    end
+
+    describe '#projection' do
+
+      let(:selector) { Model.where(created_at: Time.now).selector }
+      let(:mock) { OpenStruct.new(selector: selector) }
+
+      subject { emails_by_day.projection }
+
+      it { subject.must_be_instance_of Casino::Projection }
+
+      it "is preloaded with the current criteria intersection" do
+        emails_by_day.stub(:intersection, mock) do
+          subject.pipeline.first['$match'].must_equal selector
+        end
+      end
+
+    end
+
+    describe '#intersection' do
+      subject { emails_by_day.intersection }
+      it { subject.must_be_instance_of Mongoid::Criteria }
+      it "defaults to the base model criteria" do
+        subject.must_equal Model.scoped
+      end
     end
 
     describe '#persist_results' do
