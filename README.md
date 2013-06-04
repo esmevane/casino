@@ -64,11 +64,11 @@ Casino is a DSL which helps you interact with and explore your `Mongoid::Documen
     * *Method name:* A `:symbol` pointing to another question.  This method returns the results of that question.
   * **Returns:** An answered question key/value pair: `{ question_name: question_answer }`
 
-#### Insert (*pending*)
+#### Insert
   * **Arguments:**
     * *Documents:* Any argument passed in will be evaluated as though it were a `Mongoid::Document` of the collection's focus.
   * **Returns:** Any results which were updated with the given documents.
-  * **What it does:** `insert` is a trickle-in mechanism, which scopes any matching intersections with a given document's `id`, and then attempts to ask questions of it.  If any questions are answered, then it modifies the intersection's record with the results.
+  * **What it does:** `insert` is a trickle-in mechanism, which updates any intersections which match a document.
 
 #### Intersection
   * **Arguments:** None

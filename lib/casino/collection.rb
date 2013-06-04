@@ -43,28 +43,24 @@ module Casino
       registry[:focus]
     end
 
-    def key
-      join       = "_and_"
-      what       = questions.map(&:name).join(join)
-      parameters = dimensions.map(&:field).join(join)
-      my_name    = self.class.name.underscore
-      targets    = focus.map(&:model).map(&:name).map(&:underscore).sort.
-        join(join)
-      "#{my_name}_asks_#{targets}_about_#{what}_by_#{parameters}"
+    def store
+      @store ||= Store.new key
     end
 
-    def queries(dimension)
-      send(dimension.queries).map { |query| query.merge(dimension) }
+    def key
+      Digest::SHA1.hexdigest(key_base)
+    end
+
+    def projection
+      Casino::Projection.new(focus_model).where(intersection.selector)
+    end
+
+    def answer(method_name)
+      send(method_name)
     end
 
     def query(label, *criteria)
       Query.new(label, [], *criteria)
-    end
-
-    def intersections
-      focus.reduce(Array.new) do |aggregator, answer_focus|
-        aggregator + intersections_for(answer_focus)
-      end
     end
 
     def results
@@ -75,6 +71,20 @@ module Casino
     def update
       merge all_results
       stored_results
+    end
+
+    def intersection
+      @intersection || focus_model.scoped
+    end
+
+    def queries(dimension)
+      send(dimension.queries).map { |query| query.merge(dimension) }
+    end
+
+    def intersections
+      focus.reduce(Array.new) do |list, answer_focus|
+        list + intersections_for(answer_focus)
+      end
     end
 
     def merge(documents)
@@ -123,16 +133,32 @@ module Casino
       @intersection || focus_model.scoped
     end
 
-    def store
-      @store ||= Store.new key
+    def insert(*documents)
+      matching_intersections = match_intersections documents
+      matching_results = determine_results matching_intersections
+      merge matching_results
     end
 
-    def projection
-      Casino::Projection.new(focus_model).where(intersection.selector)
+    private
+
+    def key_base
+      join       = "_and_"
+      what       = questions.map(&:name).join(join)
+      parameters = dimensions.map(&:field).join(join)
+      my_name    = self.class.name.underscore
+      targets    = focus.map(&:model).map(&:name).map(&:underscore).sort.
+        join(join)
+      "#{my_name}_asks_#{targets}_about_#{what}_by_#{parameters}"
     end
 
-    def answer(method_name)
-      send(method_name)
+    def match_intersections(documents)
+      documents.reduce(Array.new) do |list, document|
+        list + matches_for(document)
+      end.uniq
+    end
+
+    def matches_for(document)
+      intersections.select { |intersection| intersection.match?(document) }
     end
 
     def pending_intersections
@@ -141,17 +167,14 @@ module Casino
         ids.include? intersection.selector
       end
     end
-    private :pending_intersections
 
     def focus_model
       focus.map(&:model).first
     end
-    private :focus_model
 
     def all_queries
       dimensions.map { |dimension| queries(dimension) }
     end
-    private :all_queries
 
     def intersections_for(answer_focus)
       product_of_all_queries.map do |conditions|
@@ -159,22 +182,18 @@ module Casino
         Intersection.new label, answer_focus.build_criteria(*conditions)
       end
     end
-    private :intersections_for
 
     def get_product(head, *tail)
       head.product *tail
     end
-    private :get_product
 
     def product_of_all_queries
       get_product(*all_queries)
     end
-    private :product_of_all_queries
 
     def registry
       self.class.lobby.registry
     end
-    private :registry
 
   end
 end

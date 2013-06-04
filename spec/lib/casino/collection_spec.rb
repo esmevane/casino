@@ -276,10 +276,12 @@ describe Casino::Collection do
 
     describe '#key' do
 
-      let(:key) do
+      let(:string) do
         "emails_by_day_asks_model_about_unique_emails" +
           "_by_created_at_and_source"
       end
+
+      let(:key) { Digest::SHA1.hexdigest(string) }
 
       subject { emails_by_day.key }
       it { subject.must_equal key }
