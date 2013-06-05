@@ -77,6 +77,15 @@ module Casino
       @intersection || focus_model.scoped
     end
 
+    def insert(*documents)
+      matching_intersections = match_intersections documents
+      matching_results = determine_results matching_intersections
+      merge matching_results
+      stored_results.where(id: matching_results.map(&:id))
+    end
+
+    private
+
     def queries(dimension)
       send(dimension.queries).map { |query| query.merge(dimension) }
     end
@@ -107,13 +116,6 @@ module Casino
       determine_results intersections
     end
 
-    def determine_results(given_intersections)
-      given_intersections.map do |current_intersection|
-        @intersection = current_intersection.criteria
-        result = { _id: intersection.selector }.merge(answers)
-      end
-    end
-
     def answers
       questions.reduce(Hash.new) do |hash, question|
         hash.merge question.name => send(question.answer)
@@ -123,23 +125,17 @@ module Casino
     def stored_results
       store.in(id: intersection_ids)
     end
-    alias :stored_intersections :stored_results
 
     def intersection_ids
       intersections.map(&:selector)
     end
 
-    def intersection
-      @intersection || focus_model.scoped
+    def determine_results(given_intersections)
+      given_intersections.map do |current_intersection|
+        @intersection = current_intersection.criteria
+        result = { _id: intersection.selector }.merge(answers)
+      end
     end
-
-    def insert(*documents)
-      matching_intersections = match_intersections documents
-      matching_results = determine_results matching_intersections
-      merge matching_results
-    end
-
-    private
 
     def key_base
       join       = "_and_"

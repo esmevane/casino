@@ -65,11 +65,7 @@ module Casino
     end
 
     def evolve(value)
-      if value.class.respond_to? :evolve
-        value.class.evolve(value)
-      else
-        value
-      end
+      value.class.respond_to?(:evolve) ? value.class.evolve(value) : value
     end
 
     def mongo_ready(object)
