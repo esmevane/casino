@@ -5,13 +5,13 @@ require 'casino/version'
 
 Gem::Specification.new do |gem|
 
-  gem.name          = "casino"
+  gem.name          = "mongoid-casino"
   gem.version       = Casino::VERSION
   gem.authors       = ["JC McCormick"]
   gem.email         = ["esmevane@gmail.com"]
-  gem.description   = %q{Create and maintain aggregate data with Mongoid}
-  gem.summary       = %q{Map reduce handler for Mongoid}
-  gem.homepage      = "http://www.github.com/acumenbrands/casino"
+  gem.description   = %q{Create and maintain aggregate metadata with Mongoid}
+  gem.summary       = %q{Aggregation handler for Mongoid}
+  gem.homepage      = "http://www.github.com/esmevane/casino"
 
   gem.files         = `git ls-files`.split($/)
   gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
