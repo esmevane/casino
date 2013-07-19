@@ -24,11 +24,11 @@ describe Casino::Store do
   describe '#merge' do
 
     let(:womens_boots) do
-      { '_id' => { 'date' => "mm/dd/yyyy", 'label' => "women's boots" } }
+      { '_id' => { 'date' => Date.today, 'label' => "women's boots" } }
     end
 
     let(:mens_boots) do
-      { '_id' => { 'date' => "mm/dd/yyyy", 'label' => "men's boots" } }
+      { '_id' => { 'date' => Date.today, 'label' => "men's boots" } }
     end
 
     let(:value_hash) do
@@ -40,7 +40,7 @@ describe Casino::Store do
 
     it "adds new documents to the collection" do
       store.merge(document)
-      store.first.must_equal document
+      store.first.must_equal store.mongoize(document)
     end
 
     it "updates documents" do

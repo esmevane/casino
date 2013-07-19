@@ -23,6 +23,7 @@ module Casino
 
     def merge(*documents)
       documents.each do |document|
+        document = mongoize document
         criteria = find _id: document['_id']
         criteria.upsert document
       end
@@ -30,6 +31,10 @@ module Casino
 
     def criteria
       @criteria ||= build_criteria
+    end
+
+    def mongoize(hash)
+      hash.keys.map { |key| build_mongoized_hash(hash, key) }.reduce(&:merge)
     end
 
     private
@@ -43,6 +48,16 @@ module Casino
       klass.send(:include, Mongoid::Document)
       klass.store_in collection: collection_name
       klass.scoped
+    end
+
+    def evolve(value)
+      value.class.respond_to?(:evolve) ? value.class.evolve(value) : value
+    end
+
+    def build_mongoized_hash(hash, key)
+      value = hash[key]
+      value = value.is_a?(Hash) ? mongoize(value) : value
+      { key => evolve(value) }
     end
 
   end
