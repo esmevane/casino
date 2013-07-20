@@ -1,11 +1,13 @@
 describe Casino::Store do
 
   let(:key) { "collection_name" }
-  let(:store) { Casino::Store.new(key) }
+  let(:document) { Casino::Document.new(key, ['value']).compose }
+  let(:store) { Casino::Store.new(document) }
 
   subject { store }
 
   it { subject.must_respond_to :collection_name }
+  it { subject.must_respond_to :collection_class }
 
   it "establishes a connection to the default session" do
     store.collection.database.session.must_equal Mongoid.default_session
@@ -35,23 +37,23 @@ describe Casino::Store do
       { 'value' => { 'signups' => 10850, 'uniques' => 9822 } }
     end
 
-    let(:document) { womens_boots.merge(value_hash) }
-    let(:document_two) { mens_boots.merge(value_hash) }
+    let(:attributes) { womens_boots.merge(value_hash) }
+    let(:attributes_two) { mens_boots.merge(value_hash) }
 
-    it "adds new documents to the collection" do
-      store.merge(document)
-      store.first.must_equal store.mongoize(document)
+    it "adds new document attributes to the collection" do
+      store.merge(attributes)
+      store.first.must_equal store.mongoize(attributes)
     end
 
-    it "updates documents" do
-      store.merge(document)
-      store.merge(document.merge(value: { signups: 2 }))
+    it "updates documents with new attributes" do
+      store.merge(attributes)
+      store.merge(attributes.merge(value: { signups: 2 }))
       store.first['value']['signups'].must_equal 2
     end
 
     it "does not replace the wrong document" do
-      store.merge(document)
-      store.merge(document_two)
+      store.merge(attributes)
+      store.merge(attributes_two)
       store.find.count.wont_equal 1
     end
 

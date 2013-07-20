@@ -1,6 +1,6 @@
 module Casino
   class Store
-    attr_accessor :collection_name
+    attr_accessor :collection_class, :collection_name
 
     delegate :drop, :find, :indexes, :insert, to: :collection
 
@@ -9,8 +9,9 @@ module Casino
 
     delegate :where, :in, to: :criteria
 
-    def initialize(collection_name)
-      self.collection_name = collection_name
+    def initialize(document_class)
+      self.collection_class = document_class
+      self.collection_name = document_class.collection_name
     end
 
     def collection
@@ -30,7 +31,7 @@ module Casino
     end
 
     def criteria
-      @criteria ||= build_criteria
+      @criteria ||= collection_class.scoped
     end
 
     def mongoize(hash)
@@ -41,13 +42,6 @@ module Casino
 
     def session
       @session ||= Mongoid.default_session
-    end
-
-    def build_criteria
-      klass = Class.new
-      klass.send(:include, Mongoid::Document)
-      klass.store_in collection: collection_name
-      klass.scoped
     end
 
     def evolve(value)

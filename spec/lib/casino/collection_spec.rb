@@ -7,6 +7,7 @@ describe Casino::Collection do
     it { Collection.must_respond_to :question }
     it { Collection.must_respond_to :lobby }
     it { Collection.must_respond_to :register }
+    it { Collection.new.must_respond_to :document }
     it { Collection.new.must_respond_to :query }
     it { Collection.new.must_respond_to :intersection }
     it { Collection.new.must_respond_to :answer }
@@ -64,6 +65,13 @@ describe Casino::Collection do
       it { subject.focus.must_equal focus }
       it { subject.questions.must_equal questions }
 
+    end
+
+    describe '#document' do
+      let(:storage_key) { "key" }
+      let(:questions) { ['Question Name'] }
+      subject { Collection.new.document }
+      it { subject.ancestors.must_include Mongoid::Document }
     end
 
     describe '#query' do

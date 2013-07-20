@@ -1,7 +1,7 @@
 require 'csv'
 require 'mongoid'
 
-libs = %w(collection dimension focus intersection lobby projection
+libs = %w(collection dimension document focus intersection lobby projection
   query question store version)
 path = File.dirname(__FILE__)
 

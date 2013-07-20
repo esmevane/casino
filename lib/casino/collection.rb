@@ -44,7 +44,11 @@ module Casino
     end
 
     def store
-      @store ||= Store.new key
+      @store ||= Store.new document
+    end
+
+    def document
+      @document ||= Casino::Document.new(key, questions.map(&:name)).compose
     end
 
     def key
