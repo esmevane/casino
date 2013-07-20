@@ -131,7 +131,9 @@ module Casino
     end
 
     def intersection_ids
-      intersections.map(&:selector)
+      intersections.map do |intersection|
+        intersection.selector.mongoize
+      end
     end
 
     def determine_results(given_intersections)
@@ -164,7 +166,7 @@ module Casino
     def pending_intersections
       ids = stored_results.map(&:id)
       intersections.reject do |intersection|
-        ids.include? intersection.selector
+        ids.include? intersection.selector.mongoize
       end
     end
 

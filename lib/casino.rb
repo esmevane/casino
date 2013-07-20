@@ -1,8 +1,8 @@
 require 'csv'
 require 'mongoid'
 
-libs = %w(collection dimension document focus intersection lobby projection
-  query question store version)
+libs = %w(collection dimension document focus intersection lobby
+  projection query question store version)
 path = File.dirname(__FILE__)
 
 libs.each do |lib|

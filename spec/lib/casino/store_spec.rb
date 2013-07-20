@@ -42,7 +42,7 @@ describe Casino::Store do
 
     it "adds new document attributes to the collection" do
       store.merge(attributes)
-      store.first.must_equal store.mongoize(attributes)
+      store.first.must_equal attributes.mongoize
     end
 
     it "updates documents with new attributes" do
